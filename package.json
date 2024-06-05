@@ -1,13 +1,13 @@
 {
   "name": "pull-buckets",
   "version": "1.0.0",
-  "description": "",
+  "description": "Group items and reduce each group to a single value",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tape test.js"
   },
-  "keywords": [],
+  "keywords": ["pull-stream", "group", "reduce", "segments", "aggregate", "accumulate"],
   "author": "Jan Bölsche <jan@lagomorph.de> (http://regular.codes/)",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "deep-copy": "^1.4.2",
     "pull-stream": "^3.7.0"

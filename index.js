@@ -9,34 +9,30 @@ module.exports = function(fitsBucket, add, opts) {
   let {timeout, initial, max_size} = opts
   if (max_size == undefined) max_size = 512
 
-  let end, timer, bucket = initial, reading
-  let rec_cnt = 0
-  const cbs = []
-  const buff = []
+  let reading, end, timer
+  let bucket = initial
+  let size = 0 // how many items thrown into current bucket
+  const cbs = [], queue = []
 
   return function (read) {
 
     return function (abort, cb) {
       cbs.push(cb)
 
-      if (buff.length) {
-        cb = cbs.shift()
-        const [err, acc] = buff.shift()
-        if (err) return cb(err)
-        return cb(null, acc)
+      if (queue.length) return flush()
+      if (end) {
+        queue.push([end])
+        return flush()
       }
-      if (end) return flush(end)
       if (reading) return
 
-      function flush(err, acc) {
-        buff.push([err, acc])
-        cb = cbs.shift()
-        if (cb) {
+      function flush() {
+        while (cbs.length && queue.length) {
+          const cb = cbs.shift()
+          const [err, acc] = queue.shift()
           if (timer) clearTimeout(timer)
           timer = null
-          const [err, acc] = buff.shift()
-          if (err) return cb(err)
-          return cb(null, acc)
+          cb(err, err ? null : acc)
         }
       }
 
@@ -46,7 +42,8 @@ module.exports = function(fitsBucket, add, opts) {
         timer = setTimeout(()=>{
           timer = null
           if (bucket !== null && bucket !== undefined) {
-            flush(null, copy(bucket))
+            queue.push([null, copy(bucket)])
+            flush()
           }
         }, timeout)
       }
@@ -59,19 +56,20 @@ module.exports = function(fitsBucket, add, opts) {
           reading = false
           if (err) {
             end = err
-            if (bucket) flush(null, bucket)
-            else flush(err)
-            return
+            queue.push([bucket ? null : err, bucket])
+            return flush()
           }
 
           if (bucket && !fitsBucket(bucket, data)) {
-            flush(null, bucket) // no need to copy, we create a new bucckt right away
+            queue.push([null, bucket]) // no need to copy, we create a new bucckt right away
+            flush()
             bucket = add(undefined, data)
           } else {
             bucket = add(bucket, data)
-            if (bucket && max_size && ++rec_cnt >= max_size) {
-              rec_cnt = 0
-              flush(null, copy(bucket))
+            if (bucket && max_size && ++size >= max_size) {
+              size = 0
+              queue.push([null, copy(bucket)])
+              flush()
             }
             return slurp()
           }

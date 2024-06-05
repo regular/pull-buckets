@@ -78,10 +78,10 @@ test('dont stall', t=>{
   )
 })
 
-test('max_age', t=>{
+test('max_size', t=>{
   pull(
     pull.values([1,2,4, 10,11,12]),
-    Stream(fitsBucket, add, {max_age: 2}),
+    Stream(fitsBucket, add, {max_size: 2}),
     pull.collect( (err, data)=>{
       t.deepEqual(data, [
         {tens: 0, sum: 3, l: [ 1, 2 ] },
