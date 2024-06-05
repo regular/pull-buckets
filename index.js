@@ -6,7 +6,7 @@ const copy = require('deep-copy')
 
 module.exports = function(fitsBucket, add, opts) {
   opts = opts || {}
-  let {timeout, initial,max_age} = opts
+  let {timeout, initial, max_age} = opts
   if (max_age == undefined) max_age = 512
 
   let end, timer, bucket = initial, reading
@@ -51,10 +51,10 @@ module.exports = function(fitsBucket, add, opts) {
         }, timeout)
       }
 
-      setTimer()
 
       function slurp() {
         reading = true
+        setTimer()
         read(abort, (err, data) =>{
           reading = false
           if (err) {
@@ -64,16 +64,16 @@ module.exports = function(fitsBucket, add, opts) {
             return
           }
 
-          if (!bucket || fitsBucket(bucket, data)) {
+          if (bucket && !fitsBucket(bucket, data)) {
+            flush(null, bucket) // no need to copy, we create a new bucckt right away
+            bucket = add(undefined, data)
+          } else {
             bucket = add(bucket, data)
-            if (max_age && ++rec_cnt >= max_age) {
+            if (bucket && max_age && ++rec_cnt >= max_age) {
               rec_cnt = 0
               flush(null, copy(bucket))
             }
             return slurp()
-          } else {
-            flush(null, bucket)
-            bucket = add(undefined, data)
           }
         })
       }
