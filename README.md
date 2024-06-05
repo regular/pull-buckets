@@ -52,7 +52,7 @@ returns true if the value fits into the given bucket, false otherwise
 
     add(bucket, value)
 
-if bucket is `undefined`, creates a fresh bucket and throws the given value into it. Othereise, accumulate the value in the existing bucket.
+if bucket is `undefined`, creates a fresh bucket and throws the given value into it. Othereise, accumulate the value in the existing bucket. Should manipulate bucket object in-place whenever ppssible. pull-buckets will make a copy of the bucket before sending it out.
 
 Options:
 
