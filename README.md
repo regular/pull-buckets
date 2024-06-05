@@ -56,8 +56,8 @@ if bucket is `undefined`, creates a fresh bucket and throws the given value into
 
 Options:
 
-- initial`: an initial value for the first bucket
-- timeout`: emit the current bucket once last update is older than given milliseconds
-- max_size`: start a new bucket when this number of items where thrown into current bucket
+- `initial`: an initial value for the first bucket
+- `timeout`: emit the current bucket once last update is older than given milliseconds
+- `max_size`: start a new bucket when this number of items where thrown into current bucket
 
 License: MIT
