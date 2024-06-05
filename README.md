@@ -1,7 +1,7 @@
 pull-buckets
 ===
 
-Segmentate an incoming stream into groups ("buckets") and reduce each group to a single value that is then passed downstream.
+Segmentate an incoming stream into groups ("buckets") and reduce each group to a single value that is then passed downstream. Suitable for live-streams when using hte timeout option. (Makes sure bucket value is eventually emitted when no new data comes in for a while)
 
 ``` js
 const buckets = require('pull-buckets')
