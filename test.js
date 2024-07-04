@@ -4,6 +4,26 @@ const test = require('tape')
 const pull = require('pull-stream')
 const Stream = require('.')
 
+test('make same-size buckets', t=>{
+  pull(
+    pull.values([1,2,3,4,5,6,7,8,9,10]),
+    Stream(
+      b=>b.length<3,
+      (b,i)=>{
+        b = (b || [])
+        b.push(i)
+        return b
+      }
+    ),
+    pull.collect( (err, data)=>{
+      t.notOk(err)
+      t.deepEqual(data, [ [1,2,3], [4,5,6], [7,8,9], [10]])
+      t.end()
+    })
+  )
+
+})
+
 test('aggregates values', t=>{
   pull(
     pull.values([1,2,10,11,20,25]),

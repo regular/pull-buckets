@@ -62,8 +62,8 @@ module.exports = function(fitsBucket, add, opts) {
 
           if (bucket && !fitsBucket(bucket, data)) {
             queue.push([null, bucket]) // no need to copy, we create a new bucckt right away
+            bucket = add(undefined, data) // update state *before* we call back
             flush()
-            bucket = add(undefined, data)
           } else {
             bucket = add(bucket, data)
             if (bucket && max_size && ++size >= max_size) {
